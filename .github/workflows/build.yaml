@@ -56,6 +56,11 @@ jobs:
           path: /tmp/myimage.tar
 
   ########################### test ###########################
+  unittest:
+    needs: build
+    uses: ./.github/workflows/unit_tests.yaml
+
+  ########################### test ###########################
   test:
     needs: build
     uses: ./.github/workflows/e2e_tests.yaml

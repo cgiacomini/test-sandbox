@@ -1,4 +1,4 @@
-# Run Docker image and test in  the same job ( same runner )
+# Run Docker image and test in  the same job
 ## Steps :
 1. A docker image with a simple python web app is built
 2. The docker image is uploaded in github artiftacory

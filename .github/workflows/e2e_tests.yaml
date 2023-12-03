@@ -1,0 +1,39 @@
+name: Test docker image
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+      path:
+        required: true
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Repository
+        uses: actions/checkout@v3
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{inputs.image_name}}
+          path: ${{inputs.path}}
+
+      - name: Load image
+        run: |
+          docker load --input ${{inputs.path}}/${{inputs.image_name}}.tar
+          docker image ls -a
+          docker run -d -p 8080:8080 myimage
+
+      - name: Wait for Container to Start
+        run: sleep 10  # Adjust as needed, waiting for the container to start
+
+      - name: Test Docker Container
+        working-directory: .github/workflows
+        run: |
+          curl http://localhost:8080  # Adjust URL and port based on your application

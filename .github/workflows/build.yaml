@@ -70,7 +70,7 @@ jobs:
 
   ########################### push ###########################
   push:
-    needs: [unittest test]
+    needs: [unittest, test]
     runs-on: ubuntu-latest
     permissions:
       contents: write

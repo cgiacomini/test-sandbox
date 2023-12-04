@@ -1,7 +1,7 @@
 FROM python:3
-ADD index.html index.html
-ADD pyserver.py pyserver.py
-ADD requirements.txt requirements.txt
+ADD src/index.html index.html
+ADD src/pyserver.py pyserver.py
+ADD src/requirements.txt requirements.txt
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 

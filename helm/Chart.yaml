@@ -1,0 +1,8 @@
+apiVersion: v2
+name: test-sandbox-chart
+description: A Helm chart for Kubernetes
+type: application
+# This is the chart version.
+version: 0.1.0
+# This is the app version
+appVersion: "1.16.0"

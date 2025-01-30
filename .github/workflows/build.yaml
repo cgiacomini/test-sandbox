@@ -1,4 +1,4 @@
-name: Python application test with Github Actions
+name: Python application test with GitHub Actions
 
 on:
   push:
@@ -8,10 +8,10 @@ on:
 env:
 
   # REGISTRY: ghcr.io → Defines the container registry to be GitHub Container Registry (GHCR).
-  REGISTRY: ghcr.io 
+  REGISTRY: ghcr.io
 
   # Uses GitHub’s built-in github.repository variable to dynamically name the Docker image based on the repository name (e.g., owner/repo).
-  IMAGE_NAME: ${{ github.repository }} 
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
@@ -23,6 +23,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # To automatically increment the version number with each build and include the version in the artifact name
+      # here I use use a combination of GitHub Actions and a versioning tool like semantic-release.
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run semantic-release
+        id: release
+        run: npx semantic-release
+
       - name: Extract metadata (tags, labels) for Docker
         uses: docker/metadata-action@v4
         id: meta
@@ -31,7 +45,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
-            type=semver,pattern={{version}}
+            type=semver,pattern={{steps.release.outputs.nextRelease.version}}
 
       - name: Login to GitHub registry
         uses: docker/login-action@v3
@@ -49,6 +63,23 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           # This adds metadata labels to the Docker image (e.g., author, description, version)
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          tag_name: ${{ steps.release.outputs.nextRelease.version }}
+          release_name: Release ${{ steps.release.outputs.nextRelease.version }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./path/to/your/artifact
+          asset_name: artifact-${{ steps.release.outputs.nextRelease.version }}.zip
+          asset_content_type: application/zip
 
       - name: Run Docker Container
         run: |

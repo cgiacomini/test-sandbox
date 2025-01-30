@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3-alpine
 ADD index.html index.html
 ADD pyserver.py pyserver.py
 ADD requirements.txt requirements.txt
